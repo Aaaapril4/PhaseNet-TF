@@ -1,0 +1,5 @@
+[default]
+entity = jieyaqi
+project = phasenet-tf-alaska
+base_url = https://api.wandb.ai
+

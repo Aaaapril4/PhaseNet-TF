@@ -98,3 +98,18 @@ def normalize_waveform(sample: dict) -> dict:
 
     sample.update({"data": data})
     return sample
+
+
+def check_nan(sample: dict) -> dict:
+    """
+    Args:
+        sample (dict): the sample dict
+    Returns:
+        dict: result dict without nan
+    """
+    data = sample["data"]
+    if torch.any(torch.isnan(data)):
+        data = torch.nan_to_num(data, nan=0.0)
+        
+    sample.update({"data": data})
+    return sample

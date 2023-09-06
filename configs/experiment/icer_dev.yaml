@@ -15,7 +15,7 @@ tags: ["dev", "wandb"]
 seed: 3407
 
 trainer:
-  devices: [1, 2, 3]
+  devices: [0, 1, 2, 3]
   max_epochs: 1
 
 callbacks:
@@ -28,3 +28,6 @@ callbacks:
 logger:
   wandb:
     project: "PhaseNet-TF-Test"
+
+model:
+  output_classes_weight: [0.20, 0.20, 0.60, 0.0]

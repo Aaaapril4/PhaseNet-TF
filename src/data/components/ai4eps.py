@@ -11,7 +11,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-from src.data.components.utils import generate_label, normalize_waveform, stack_rand
+from src.data.components.utils import generate_label, normalize_waveform, stack_rand, check_nan
 
 
 class Ai4epsDataset(Dataset):
@@ -156,6 +156,8 @@ class Ai4epsDataset(Dataset):
 
         # normalize the data at the end
         current_sample = normalize_waveform(current_sample)
+        # replace nan in data
+        current_sample = check_nan(current_sample)
         # remove unused keys, including start_index, end_index
         current_sample.pop("start_index", None)
         current_sample.pop("end_index", None)

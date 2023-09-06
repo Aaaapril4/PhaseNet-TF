@@ -91,7 +91,9 @@ class PhaseNetTFModule(LightningModule):
         return nn.ModuleDict(metrics_dict)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        # print('forward x', torch.any(torch.isnan(x)), end='\n')
         sgram = self.sgram_generator(x)
+        # print('forward sgram', torch.any(torch.isnan(sgram)), end='\n')
         output = self.net(sgram)
         predict = output["predict"]
         return predict, sgram
@@ -140,6 +142,8 @@ class PhaseNetTFModule(LightningModule):
         return sgram_power
 
     def training_step(self, batch: dict, batch_idx: int) -> dict:
+        # print(batch['key'], end = '\n')
+        # print('batch data', torch.any(torch.isnan(batch['data'])), end = '\n')
         loss, sgram_power, predict = self.model_step(batch)
         peaks = self.extract_peaks_from_predict(predict)
 
