@@ -6,12 +6,12 @@
 defaults:
   - override /trainer: multiple_gpu.yaml
   - override /logger: wandb.yaml
-  - override /hydra: slurm_2n8g_v100.yaml
+  - override /hydra: slurm_2n8g_v100_expanse.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
 
-tags: ["production", "mul_nodes", "wandb"]
+tags: ["production", "mul_nodes", "wandb", "expanse"]
 
 seed: 3407
 

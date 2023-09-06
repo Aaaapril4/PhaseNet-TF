@@ -1,24 +1,16 @@
 """
-predict.py: serve the model as a REST API
+app.py: serve the model as a REST API
 """
-import warnings
 from pathlib import Path
-from typing import List
 
 import hydra
 import pyrootutils
 import torch
-from lightning import Callback, LightningDataModule, LightningModule, Trainer
-from lightning.pytorch.loggers import Logger
 from omegaconf import DictConfig
 
 from src import utils
 
 pyrootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
-
-# ignore warnings
-warnings.filterwarnings("ignore", ".*SELECT statement has a cartesian product*")
-
 # ------------------------------------------------------------------------------------ #
 # the setup_root above is equivalent to:
 # - adding project root dir to PYTHONPATH
@@ -40,7 +32,9 @@ warnings.filterwarnings("ignore", ".*SELECT statement has a cartesian product*")
 log = utils.get_pylogger(__name__)
 
 
-@hydra.main(version_base="1.3", config_path="../configs", config_name="predict.yaml")
+@hydra.main(
+    version_base="1.3", config_path="../configs", config_name="export_onnx.yaml"
+)
 def main(cfg: DictConfig) -> None:
     # apply extra utilities
     # (e.g. ask for tags if none are provided in cfg, print cfg tree, etc.)
@@ -53,30 +47,22 @@ def main(cfg: DictConfig) -> None:
     log.info(f"Instantiating model <{cfg.model._target_}>")
     Model = hydra.utils.get_class(cfg.model._target_)
 
-    model: LightningModule = Model.load_from_checkpoint(  # type: ignore
-        cfg.ckpt_path, map_location=torch.device("cpu")
-    )
-
-    # load data module
-    log.info(f"Instantiating datamodule <{cfg.data._target_}>")
-    datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
-
-    # callbacks containing inference step and writer
-    log.info("Instantiating callbacks...")
-    callbacks: List[Callback] = utils.instantiate_callbacks(cfg.get("callbacks"))
-
-    log.info("Instantiating loggers...")
-    logger: List[Logger] = utils.instantiate_loggers(cfg.get("logger"))
-
-    log.info(f"Instantiating trainer <{cfg.trainer._target_}>")
-    trainer: Trainer = hydra.utils.instantiate(
-        cfg.trainer, callbacks=callbacks, logger=logger
-    )
-
-    # do inference
-    log.info("Starting inference...")
-    model.eval()
-    trainer.predict(model, datamodule=datamodule)
+    model = Model.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))  # type: ignore
+    input_shape = torch.randn(1, 3, cfg.model.get("window_length_in_npts", 4800))
+    onnx_path = cfg.get("onnx_path", None)
+    if onnx_path is not None:
+        log.info(
+            f"Exporting model to ONNX format: {onnx_path} with input shape {input_shape.shape}"
+        )
+        model.to_onnx(
+            onnx_path,
+            input_shape,
+            export_params=True,
+            input_names=["waveform"],
+            output_names=["prediction", "spectrogram"],
+        )
+    else:
+        log.info("Skipping ONNX export as no ONNX export path was provided")
 
 
 if __name__ == "__main__":

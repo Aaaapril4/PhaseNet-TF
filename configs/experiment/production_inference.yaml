@@ -4,20 +4,24 @@
 defaults:
   - override /trainer: single_gpu.yaml
   - override /logger: csv.yaml
+  - override /hydra: inference_1n4g_v100.yaml
 
 data:
-  inference_requirement_path: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/batch_inference/mantle_wedge_examples/13877.csv
-  inference_output_dir: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/batch_inference/mantle_wedge_examples_result/13877
+  inference_requirement_path: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/batch_inference/all_months.csv
+  inference_output_dir: /mnt/scratch/xiziyi/inference/all_months_semis_v1
   tsindex_database_path: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/batch_inference/dataset_continious/tongaml_continious_response_removed.sqlite
 
 callbacks:
   batch_inference_writer:
-    output_dir: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/batch_inference/mantle_wedge_examples_result/13877
-    save_prediction_stream: True
-    save_waveform_stream: True
+    output_dir: /mnt/scratch/xiziyi/inference/all_months_semis_v1
+    save_prediction_stream: False
+    save_waveform_stream: False
     save_phase_arrivals: True
+  batch_inference_step:
+    extract_phase_sensitivity: [0.5, 0.5]
 
 trainer:
-  devices: [3]
+  devices: [0, 1, 2, 3]
+  max_epochs: 1
 
 ckpt_path: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/models/model.ckpt

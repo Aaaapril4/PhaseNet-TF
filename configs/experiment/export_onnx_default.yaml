@@ -1,0 +1,4 @@
+# @package _global_
+
+ckpt_path: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/models/model.ckpt
+onnx_path: /mnt/home/xiziyi/Packages_Research/PhaseNet-TF/models/model.onnx
