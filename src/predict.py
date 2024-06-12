@@ -75,7 +75,18 @@ def main(cfg: DictConfig) -> None:
 
     # do inference
     log.info("Starting inference...")
+
+    # def forward_hook(module, input, output):
+    #     if torch.isnan(output).any():
+    #         print(f"NaN detected in {module}")
+    # for name, module in model.named_modules():
+    #     module.register_forward_hook(forward_hook)
+    
     model.eval()
+    # for param in model.parameters():
+    #     print(param)
+    #     if torch.isnan(param).any():
+    #         print("Model parameters contain NaNs")
     trainer.predict(model, datamodule=datamodule)
 
 

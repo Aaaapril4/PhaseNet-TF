@@ -95,9 +95,18 @@ class TSIndexDataset(Dataset):
         # convert to tensor
         res = self.stream_to_tensor_transform(st)
         if res is None:
-            raise Exception(
-                f"Cannot find data for {net}.{sta} from {start} to {end} for RTZ or ENZ or 12Z components"
-            )
+            error_log_file = self.inference_output_dir / "error.log"
+            if not error_log_file.exists():
+                error_log_file.touch()
+                # write the header
+                with open(error_log_file, "w") as f:
+                    f.write("net,sta,start,end,stream_len,error_info\n")
+            with open(error_log_file, "a") as f:
+                f.write(f"{net},{sta},{start},{end},{len(st)},\n")
+            return {}
+            # raise Exception(
+            #     f"Cannot find data for {net}.{sta} from {start} to {end} for RTZ or ENZ or 12Z components"
+            # )
         # now res has keys: ids, data, true_start
         res.update(
             {
@@ -145,6 +154,8 @@ class StreamToTensorTransform:
         # there might be cases that the starting time is not aligned, so here we trim everything first
         true_start = max(item.stats.starttime for item in traces)
         true_end = min(item.stats.endtime for item in traces)
+        if true_end < true_start:
+            return None
         for i in range(len(traces)):
             traces[i].trim(true_start, true_end)
         min_length = min(len(item) for item in traces)
@@ -156,6 +167,7 @@ class StreamToTensorTransform:
         data = torch.zeros((3, min_length))
         for i in range(3):
             data[i, :] = torch.from_numpy(traces[i].data[:min_length])
+        if torch.any(torch.isnan(data)):
+            data = torch.nan_to_num(data, nan=0.0)
         res["data"] = data
-
         return res
