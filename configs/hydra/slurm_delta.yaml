@@ -1,0 +1,16 @@
+defaults:
+  - default.yaml
+
+launcher:
+  timeout_min: 2800
+  nodes: 8
+  tasks_per_node: 4
+  cpus_per_task: 16
+  mem_gb: 0
+  partition: gpuA100x4
+  account: bdfk-delta-gpu
+  additional_parameters:
+    gpus-per-node: 4
+    gpu-bind: closest
+    constraint: scratch
+  setup: ["ulimit -n 100000"]
