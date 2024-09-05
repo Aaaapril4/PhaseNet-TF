@@ -6,4 +6,4 @@ devices: 4
 num_nodes: 8
 strategy: "ddp_find_unused_parameters_false"
 
-max_epochs: 160
+max_epochs: 200

@@ -46,7 +46,7 @@ test: True
 compile: False
 
 # simply provide checkpoint path to resume training
-ckpt_path: /u/jieyaqi/EQDetection/PhaseNet-TF/logs/train/multiruns/2024-08-23_17-29-11/0/checkpoints/epoch=116-loss_val=3.92.ckpt
+ckpt_path: /u/jieyaqi/EQDetection/PhaseNet-TF/logs/train/multiruns/2024-08-28_13-52-48/0/checkpoints/epoch=159-loss_val=3.17.ckpt
 
 # seed for random number generators in pytorch, numpy and python.random
 seed: 3407

@@ -30,4 +30,4 @@ model:
   output_classes_weight: [0.20, 0.20, 0.60, 0.0]
 
 trainer:
-  max_epochs: 160
+  max_epochs: 200
